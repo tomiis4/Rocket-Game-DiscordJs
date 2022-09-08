@@ -60,15 +60,83 @@ client.on('interactionCreate', async (interaction: any) => {
 });
 
 // Spawn command
+
+const blueSquare = ":blue_square:"
+const greenSquare = ":green_square:"
+const blackSquare = ":black_large_square:"
+const whiteSquare = ":white_large_square:"
+const yellowSquare = ":yellow_square:"
+const orangeSquare = ":orange_square:"
+const redSquare = ":red_square:"
+
+let currentGrass: number = 4 // 4 default
+let currentSky: number = 12 - currentGrass
+
 client.on('interactionCreate', async (interaction: any) => {
   if (!interaction.isChatInputCommand()) return;
   if (interaction.commandName == "spawn") {
-    const pingEmbed = new EmbedBuilder() // Create embed
-    .setTitle(`Boar user @${interaction.user.username}`)
-    .setDescription(':blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square:\n:blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square:\n:blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square:\n:blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square:\n:blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square:\n:blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square:\n:blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square:\n:blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square::blue_square:\n:green_square::green_square::green_square::green_square::green_square::green_square::green_square::green_square::green_square::green_square::green_square::green_square::green_square:\n:green_square::green_square::green_square::green_square::green_square::green_square::green_square::green_square::green_square::green_square::green_square::green_square::green_square:\n:green_square::green_square::green_square::green_square::green_square::green_square::green_square::green_square::green_square::green_square::green_square::green_square::green_square:\n:green_square::green_square::green_square::green_square::green_square::green_square::green_square::green_square::green_square::green_square::green_square::green_square::green_square:')
-    .setColor(`#${randomColor}`)
-    .setTimestamp()
-    interaction.reply({ embeds: [pingEmbed] })
+    let board = [] // create array of item
+    
+    for (let i=0; i < currentSky; i++) { // loop that will add sky squares to the array
+      board.push([blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare,"\n"])
+    
+      if (i == (currentSky-1)) { // if its end on the loop
+        for (let j=0; j <= currentGrass; j++) { // loop that will add grass squares to the array
+          board.push([greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare,"\n"])
+          
+          if (j >= (currentGrass-1)) { // if its end on the loop
+
+            board[1][6] = blackSquare //top
+            board[2][5] = blackSquare //top
+            board[2][6] = blackSquare //top
+            board[2][7] = blackSquare //top
+
+            board[3][5] = whiteSquare //mid
+            board[3][6] = whiteSquare //mid
+            board[3][7] = whiteSquare //mid
+
+            board[4][5] = whiteSquare //mid
+            board[4][6] = whiteSquare //mid
+            board[4][7] = whiteSquare //mid
+
+            board[5][5] = whiteSquare //mid
+            board[5][6] = whiteSquare //mid
+            board[5][7] = whiteSquare //mid
+
+            board[6][5] = whiteSquare //mid
+            board[6][6] = whiteSquare //mid
+            board[6][7] = whiteSquare //mid
+
+            board[7][5] = whiteSquare //mid
+            board[7][6] = whiteSquare //mid
+            board[7][7] = whiteSquare //mid
+
+            board[8][4] = blackSquare //engine
+            board[8][6] = blackSquare //engine
+            board[8][8] = blackSquare //engine
+
+            board[9][4] = yellowSquare //fire
+            board[9][5] = orangeSquare //fire
+            board[9][6] = yellowSquare //fire
+            board[9][7] = orangeSquare //fire
+            board[9][8] = yellowSquare //fire
+
+            board[10][5] = redSquare //fire
+            board[10][6] = orangeSquare //fire
+            board[10][7] = redSquare //fire
+
+
+            const spawnEmbed = new EmbedBuilder() // Create embed
+              .setTitle(`Boar user @${interaction.user.username}`)
+              .setDescription(board.toString().replace(/,/g,'')) //convert board to string and remove ","
+              .setColor(`#${randomColor}`)
+              .setTimestamp()
+
+            interaction.reply({ embeds: [spawnEmbed] }) // reply with embed
+          }
+        }
+      }
+    }
   }
 });
 

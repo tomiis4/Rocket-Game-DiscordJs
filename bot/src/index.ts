@@ -2,12 +2,11 @@ const dotenv = require('dotenv').config();
 const { REST  } = require('@discordjs/rest');
 const  { ButtonStyle, Client, GatewayIntentBits, AttachmentBuilder, EmbedBuilder, Routes, ActionRowBuilder, SelectMenuBuilder, ActivityType, ButtonBuilder  } = require('discord.js');
 const client = new Client({
-    intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMessages,
-    ]
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+  ]
 });
-
 
 const clientId = process.env.CLIENT_ID;
 const token = process.env.TOKEN;
@@ -16,9 +15,11 @@ const rest = new REST({ version: '10' }).setToken(token);
 
 const randomColor = Math.floor(Math.random()*16777215).toString(16);
 
+
 client.on("ready", () => {
     console.log(`[DISCORD] ${client.user.username} has been online`);
 })
+
 
 const commands = [
   {
@@ -30,8 +31,6 @@ const commands = [
     description: 'spawn command will respond with board.'
   }
 ];
-
-
 // Spawn commands
 (async () => {
 	try {
@@ -40,11 +39,10 @@ const commands = [
 			{ body: commands },
 		);
     console.log('Successfully reloaded application (/) commands.');
-	} catch (error) {
-		console.error(error);
+	} catch (err) {
+		console.error(err);
 	}
 })();
-
 
 
 // Ping command
@@ -60,6 +58,7 @@ client.on('interactionCreate', async (interaction: any) => {
 });
 
 
+// Variables
 const blueSquare = ":blue_square:"
 const greenSquare = ":green_square:"
 const blackSquare = ":black_large_square:"
@@ -67,6 +66,10 @@ const whiteSquare = ":white_large_square:"
 const yellowSquare = ":yellow_square:"
 const orangeSquare = ":orange_square:"
 const redSquare = ":red_square:"
+
+let board: any[] = [] // create array of item
+let currentGrass: number = 4 // 4 default
+let currentSky: number = 12 - currentGrass
 
 const rocketJSON = {
   name: "rocket1",
@@ -199,13 +202,35 @@ const rocketJSON = {
   ]
 }
 
+const moveButton = new ActionRowBuilder()
+  .addComponents(
+    new ButtonBuilder()
+      .setCustomId('btnLeft')
+      .setLabel('Left')
+      .setStyle(ButtonStyle.Primary),
+    new ButtonBuilder()
+      .setCustomId('btnRight')
+      .setLabel('Right')
+      .setStyle(ButtonStyle.Primary),
+);
 
+const resetBoard = () => {
+  board = []
+  for (let i=0; i < currentSky; i++) { // loop that will add sky squares to the array
+    board.push([blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare,"\n"])
+    
+    if (i == (currentSky-1)) { // if its end on the loop
+      for (let j=0; j < currentGrass; j++) { // loop that will add grass squares to the array
+        board.push([greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare,"\n"])
+      }
+    }
+  }
+}
+
+//  Board Command
 client.on('interactionCreate', async (interaction: any) => {
   if (!interaction.isChatInputCommand()) return;
   if (interaction.commandName == "spawn") {
-    let board = [] // create array of item
-    let currentGrass: number = 4 // 4 default
-    let currentSky: number = 12 - currentGrass
     
     for (let i=0; i < currentSky; i++) { // loop that will add sky squares to the array
       board.push([blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare,"\n"])
@@ -216,7 +241,7 @@ client.on('interactionCreate', async (interaction: any) => {
           
           if (j >= (currentGrass-1)) { // if its end on the loop
 
-            for (let num in rocketJSON.parts) {
+            for (let num in rocketJSON.parts) { // loop trough rocket parts
               let xPos = rocketJSON.parts[num].position[0]
               let yPos = rocketJSON.parts[num].position[1]
               let blockColor = rocketJSON.parts[num].color
@@ -225,17 +250,62 @@ client.on('interactionCreate', async (interaction: any) => {
             }
 
             const spawnEmbed = new EmbedBuilder() // Create embed
-              .setTitle(`Rocket user @${interaction.user.username}`)
+              .setTitle(`Rocket by user @${interaction.user.username}`)
               .setDescription(board.toString().replace(/,/g,'')) //convert board to string and remove ","
               .setColor(`#${randomColor}`)
               .setTimestamp()
 
-            await interaction.reply({ embeds: [spawnEmbed] }) // reply with embed
+            await interaction.reply({ embeds: [spawnEmbed], components: [moveButton] }) // reply with embed
           }
         }
       }
     }
   }
 });
+
+
+// Board button command
+client.on('interactionCreate', async (interaction: any) => {
+	if (!interaction.isButton()) return;
+	if (interaction.customId == "btnLeft") { // if left button is pressed
+    resetBoard()
+
+    for (let num in rocketJSON.parts) { // loop trough rocket parts
+      rocketJSON.parts[num].position[1] -= 1
+      let xPos = rocketJSON.parts[num].position[0]
+      let yPos = rocketJSON.parts[num].position[1]
+      let blockColor = rocketJSON.parts[num].color
+  
+      board[xPos][yPos] = blockColor
+    }
+    const spawnEmbed = new EmbedBuilder() // Create embed
+      .setTitle(`Rocket by user @${interaction.user.username}`)
+      .setDescription(board.toString().replace(/,/g,'')) //convert board to string and remove ","
+      .setColor(`#${randomColor}`)
+      .setTimestamp()
+
+    await interaction.reply({ embeds: [spawnEmbed], components: [moveButton] }) // reply with embed
+  }
+
+	if (interaction.customId == "btnRight") { // if right button is pressed
+    resetBoard()
+
+    for (let num in rocketJSON.parts) { // loop trough rocket parts
+      rocketJSON.parts[num].position[1] += 1
+      let xPos = rocketJSON.parts[num].position[0]
+      let yPos = rocketJSON.parts[num].position[1]
+      let blockColor = rocketJSON.parts[num].color
+  
+      board[xPos][yPos] = blockColor
+    }
+    const spawnEmbed = new EmbedBuilder() // Create embed
+      .setTitle(`Rocket by user @${interaction.user.username}`)
+      .setDescription(board.toString().replace(/,/g,'')) //convert board to string and remove ","
+      .setColor(`#${randomColor}`)
+      .setTimestamp()
+
+    await interaction.reply({ embeds: [spawnEmbed], components: [moveButton] }) // reply with embed
+  }
+})
 
 client.login(token); 

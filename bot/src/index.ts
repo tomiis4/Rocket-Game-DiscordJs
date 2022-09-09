@@ -1,6 +1,6 @@
 const dotenv = require('dotenv').config();
 const { REST  } = require('@discordjs/rest');
-const  { Client, GatewayIntentBits, AttachmentBuilder, EmbedBuilder, Routes, ActionRowBuilder, SelectMenuBuilder, ActivityType  } = require('discord.js');
+const  { ButtonStyle, Client, GatewayIntentBits, AttachmentBuilder, EmbedBuilder, Routes, ActionRowBuilder, SelectMenuBuilder, ActivityType, ButtonBuilder  } = require('discord.js');
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -52,14 +52,13 @@ client.on('interactionCreate', async (interaction: any) => {
   if (!interaction.isChatInputCommand()) return;
   if (interaction.commandName == "ping") {
     const pingEmbed = new EmbedBuilder() // Create embed
-    .setTitle(`Response time is: ${ Date.now() - interaction.createdTimestamp}ms`)
-    .setColor(`#${randomColor}`)
-    .setTimestamp()
-    interaction.reply({ embeds: [pingEmbed] })
+      .setTitle(`Response time is: ${ Date.now() - interaction.createdTimestamp}ms`)
+      .setColor(`#${randomColor}`)
+      .setTimestamp()
+    await interaction.reply({ embeds: [pingEmbed] })
   }
 });
 
-// Spawn command
 
 const blueSquare = ":blue_square:"
 const greenSquare = ":green_square:"
@@ -69,70 +68,169 @@ const yellowSquare = ":yellow_square:"
 const orangeSquare = ":orange_square:"
 const redSquare = ":red_square:"
 
-let currentGrass: number = 4 // 4 default
-let currentSky: number = 12 - currentGrass
+const rocketJSON = {
+  name: "rocket1",
+  parts: [
+    // capsule
+    {
+      position: [1, 6], // x, y
+      color: blackSquare
+    },
+    {
+      position: [2, 5], // x, y
+      color: blackSquare
+    },
+    {
+      position: [2, 6], // x, y
+      color: blackSquare
+    },
+    {
+      position: [2, 7], // x, y
+      color: blackSquare
+    },
+    // fuel tanks
+    {
+      position: [3, 5], // x, y
+      color: whiteSquare
+    },
+    {
+      position: [3, 6], // x, y
+      color: whiteSquare
+    },
+    {
+      position: [3, 7], // x, y
+      color: whiteSquare
+    },
+    {
+      position: [4, 5], // x, y
+      color: whiteSquare
+    },
+    {
+      position: [4, 6], // x, y
+      color: whiteSquare
+    },
+    {
+      position: [4, 7], // x, y
+      color: whiteSquare
+    },
+    {
+      position: [5, 5], // x, y
+      color: whiteSquare
+    },
+    {
+      position: [5, 6], // x, y
+      color: whiteSquare
+    },
+    {
+      position: [5, 7], // x, y
+      color: whiteSquare
+    },
+    {
+      position: [6, 5], // x, y
+      color: whiteSquare
+    },
+    {
+      position: [6, 6], // x, y
+      color: whiteSquare
+    },
+    {
+      position: [6, 7], // x, y
+      color: whiteSquare
+    },
+    {
+      position: [7, 5], // x, y
+      color: whiteSquare
+    },
+    {
+      position: [7, 6], // x, y
+      color: whiteSquare
+    },
+    {
+      position: [7, 7], // x, y
+      color: whiteSquare
+    },
+    // engine
+    {
+      position: [8, 4], // x, y
+      color: blackSquare
+    },
+    {
+      position: [8, 6], // x, y
+      color: blackSquare
+    },
+    {
+      position: [8, 8], // x, y
+      color: blackSquare
+    },
+    // fire 1
+    {
+      position: [9, 4], // x, y
+      color: yellowSquare
+    },
+    {
+      position: [9, 5], // x, y
+      color: orangeSquare
+    },
+    {
+      position: [9, 6], // x, y
+      color: yellowSquare
+    },
+    {
+      position: [9, 7], // x, y
+      color: orangeSquare
+    },
+    {
+      position: [9, 8], // x, y
+      color: yellowSquare
+    },
+    // fire 2
+    {
+      position: [10, 5], // x, y
+      color: redSquare
+    },
+    {
+      position: [10, 6], // x, y
+      color: orangeSquare
+    },
+    {
+      position: [10, 7], // x, y
+      color: redSquare
+    },
+  ]
+}
+
 
 client.on('interactionCreate', async (interaction: any) => {
   if (!interaction.isChatInputCommand()) return;
   if (interaction.commandName == "spawn") {
     let board = [] // create array of item
+    let currentGrass: number = 4 // 4 default
+    let currentSky: number = 12 - currentGrass
     
     for (let i=0; i < currentSky; i++) { // loop that will add sky squares to the array
       board.push([blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare,"\n"])
     
       if (i == (currentSky-1)) { // if its end on the loop
-        for (let j=0; j <= currentGrass; j++) { // loop that will add grass squares to the array
+        for (let j=0; j < currentGrass; j++) { // loop that will add grass squares to the array
           board.push([greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare,"\n"])
           
           if (j >= (currentGrass-1)) { // if its end on the loop
 
-            board[1][6] = blackSquare //top
-            board[2][5] = blackSquare //top
-            board[2][6] = blackSquare //top
-            board[2][7] = blackSquare //top
-
-            board[3][5] = whiteSquare //mid
-            board[3][6] = whiteSquare //mid
-            board[3][7] = whiteSquare //mid
-
-            board[4][5] = whiteSquare //mid
-            board[4][6] = whiteSquare //mid
-            board[4][7] = whiteSquare //mid
-
-            board[5][5] = whiteSquare //mid
-            board[5][6] = whiteSquare //mid
-            board[5][7] = whiteSquare //mid
-
-            board[6][5] = whiteSquare //mid
-            board[6][6] = whiteSquare //mid
-            board[6][7] = whiteSquare //mid
-
-            board[7][5] = whiteSquare //mid
-            board[7][6] = whiteSquare //mid
-            board[7][7] = whiteSquare //mid
-
-            board[8][4] = blackSquare //engine
-            board[8][6] = blackSquare //engine
-            board[8][8] = blackSquare //engine
-
-            board[9][4] = yellowSquare //fire
-            board[9][5] = orangeSquare //fire
-            board[9][6] = yellowSquare //fire
-            board[9][7] = orangeSquare //fire
-            board[9][8] = yellowSquare //fire
-
-            board[10][5] = redSquare //fire
-            board[10][6] = orangeSquare //fire
-            board[10][7] = redSquare //fire
-
+            for (let num in rocketJSON.parts) {
+              let xPos = rocketJSON.parts[num].position[0]
+              let yPos = rocketJSON.parts[num].position[1]
+              let blockColor = rocketJSON.parts[num].color
+          
+              board[xPos][yPos] = blockColor
+            }
 
             const spawnEmbed = new EmbedBuilder() // Create embed
-              .setTitle(`Boar user @${interaction.user.username}`)
+              .setTitle(`Rocket user @${interaction.user.username}`)
               .setDescription(board.toString().replace(/,/g,'')) //convert board to string and remove ","
               .setColor(`#${randomColor}`)
               .setTimestamp()
 
-            interaction.reply({ embeds: [spawnEmbed] }) // reply with embed
+            await interaction.reply({ embeds: [spawnEmbed] }) // reply with embed
           }
         }
       }
@@ -140,5 +238,4 @@ client.on('interactionCreate', async (interaction: any) => {
   }
 });
 
-client.login(token);
-
+client.login(token); 

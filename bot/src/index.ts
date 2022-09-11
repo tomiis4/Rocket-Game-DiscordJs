@@ -49,7 +49,7 @@ const commands = [
 client.on('interactionCreate', async (interaction: any) => {
   if (!interaction.isChatInputCommand()) return;
   if (interaction.commandName == "ping") {
-    const pingEmbed = new EmbedBuilder() // Create embed
+    const pingEmbed = new EmbedBuilder()
       .setTitle(`Response time is: ${ Date.now() - interaction.createdTimestamp}ms`)
       .setColor(`#${randomColor}`)
       .setTimestamp()
@@ -68,10 +68,18 @@ const orangeSquare = ":orange_square:"
 const redSquare = ":red_square:"
 const purpleSquare = ":purple_square:"
 
-let board: any[] = [] // create array of item
-var currentGrass: number = 4
-var currentSky: number = 12 - currentGrass
+let clouds: any[] = []
+let currentGround = 4;
+let currentSky = 12 - currentGround;
 
+let currentHeight: number = 0
+let purpleSkyNumb = 0
+let blueSkyNumb = 12
+
+let currentWorld: any[] = []
+let displayWorld: any[] = currentWorld.slice()  
+
+let currentRocket: any[] = []
 const rocketJSON = {
   name: "rocket1",
   parts: [
@@ -213,94 +221,197 @@ const moveButton = new ActionRowBuilder()
       .setCustomId('btnRight')
       .setLabel('Right')
       .setStyle(ButtonStyle.Primary),
-);
+)
 const startButton = new ActionRowBuilder()
   .addComponents(
     new ButtonBuilder()
       .setCustomId('startFly')
       .setLabel('Start')
       .setStyle(ButtonStyle.Success),
-);
+)
 
-const resetBoard = () => {
-  board = []
 
-  for (let i=0; i < currentSky; i++) { // loop that will add sky squares to the array
-    board.push([blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare,"\n"])
+const getRandomClouds = () => {
+  for (let i=0; i<5; i++) {
+    let randomX = (Math.floor(Math.random() * 13) + 1)
+    let randomY = (Math.floor(Math.random() * 7) + 1)
+    clouds.push([randomX, randomX + 1, randomY])
+  }
+}
+const getWorld = () => {
+  currentWorld = []
+  for (let i=0; i < currentSky; i++) {
+    currentWorld.push([blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare,"\n"])
     
-    if (i == (currentSky-1)) { // if its end on the loop
-      for (let j=0; j < currentGrass; j++) { // loop that will add grass squares to the array
-        board.push([greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare,"\n"])
+    if (i == (currentSky-1)) {
+      for (let j=0; j < currentGround; j++) {
+        currentWorld.push([greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare,"\n"])
       }
     }
   }
 }
+//! const appendClouds = () => {
+//   for (let cloudNumber in clouds) {
+//     let cloudX1 = clouds[cloudNumber][0]
+//     let cloudX2 = clouds[cloudNumber][1]
+//     let cloudY = clouds[cloudNumber][2]
 
-const spawnSky = () => {
-  board = []
+//     currentWorld[cloudY][cloudX1] = purpleSquare
+//     currentWorld[cloudY][cloudX2] = purpleSquare
+//   }
+//! }
+const getRocket = () => {
+  for (let num in rocketJSON.parts) {
+    let xPosition = rocketJSON.parts[num].position[0]
+    let yPosition = rocketJSON.parts[num].position[1]
+    let blockColor = rocketJSON.parts[num].color
 
-  for (let i=0; i < 12; i++) {
-    board.push([blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare,"\n"])
+    currentRocket.push([xPosition, yPosition, blockColor])
+  }
+}
+const appendWorld = async () => {  
+  currentWorld = []
+  getWorld()
+  // appendClouds()
+  displayWorld = currentWorld.slice()  
+
+  for (let number in currentRocket) {
+    let partX = currentRocket[number][0]
+    let partY = currentRocket[number][1]
+    let partColor = currentRocket[number][2]
+    
+    displayWorld[partX][partY] = partColor
+  }
+}
+const flyRocket = (moveClouds: number, groundSize: number) => {
+  currentWorld = []
+  let currentGroundFly = groundSize
+  currentGround = groundSize
+  let currentSkyFly = 12 - currentGroundFly
+
+  for (let i=0; i < currentSkyFly; i++) {
+    currentWorld.push([blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare,"\n"])
+    
+    if (i == (currentSkyFly-1)) {
+      for (let j=0; j < currentGroundFly; j++) {
+        currentWorld.push([greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare,"\n"])
+      }
+    }
+  }
+
+  displayWorld = currentWorld.slice() 
+
+  for (let number in clouds) {
+    clouds[number][2] -= moveClouds
+  }
+  // appendClouds()
+
+  for (let number in currentRocket) {
+    let partX = currentRocket[number][0]
+    let partY = currentRocket[number][1]
+    let partColor = currentRocket[number][2]
+    
+    displayWorld[partX][partY] = partColor
+  }
+}
+
+const moveRocketRight = () => {
+  for (let number in currentRocket) {
+    currentRocket[number][1] += 1 
+  }
+  appendWorld()
+}
+
+const spawnSpace = () => {
+  currentWorld = []
+  let purpleSkyNumb = 0
+  let blueSkyNumb = 12
+
+  let purpleSky = currentWorld.push([purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare,"\n"])
+  let blueSky = currentWorld.push([blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare,"\n"])
+
+  for (let i=0; i < purpleSkyNumb; i++) {
+    purpleSky
+  }
+  for (let i=0; i < blueSkyNumb; i++) {
+    blueSky
   }
 }
 
 
-//  Board Command
+//  World Command
 client.on('interactionCreate', async (interaction: any) => {
   if (!interaction.isChatInputCommand()) return;
   if (interaction.commandName == "spawn") {
-    board = []
+    getRandomClouds()
+    getRocket()
+    appendWorld()
 
-    for (let i=0; i < currentSky; i++) { // loop that will add sky squares to the array
-      board.push([blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare,"\n"])
+    const spawnEmbed = new EmbedBuilder() // Create embed
+      .setTitle(`Height: ${currentHeight}`)
+      .setDescription(displayWorld.toString().replace(/,/g,'')) //convert board to string and remove ","
+      .setColor(`#${randomColor}`)
+      .setTimestamp()
+      .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` })
     
-      if (i == (currentSky-1)) { // if its end on the loop
-        for (let j=0; j < currentGrass; j++) { // loop that will add grass squares to the array
-          board.push([greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare,"\n"])
-          
-          if (j >= (currentGrass-1)) { // if its end on the loop
-
-            for (let num in rocketJSON.parts) { // loop trough rocket parts
-              let xPos = rocketJSON.parts[num].position[0]
-              let yPos = rocketJSON.parts[num].position[1]
-              let blockColor = rocketJSON.parts[num].color
-          
-              board[xPos][yPos] = blockColor
-            }
-
-            const spawnEmbed = new EmbedBuilder() // Create embed
-              .setTitle(`Rocket by user @${interaction.user.username}`)
-              .setDescription(board.toString().replace(/,/g,'')) //convert board to string and remove ","
-              .setColor(`#${randomColor}`)
-              .setTimestamp()
-              .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` })
-
-            await interaction.reply({ embeds: [spawnEmbed], components: [startButton] }) // reply with embed
-          }
-        }
-      }
-    }
+    await interaction.reply({ embeds: [spawnEmbed], components: [startButton] }) // reply with embed
   }
 });
 
+//TODO Add clouds
+// Start button command
+client.on('interactionCreate', async (interaction: any) => {
+	if (!interaction.isButton()) return;
+	if (interaction.customId == "startFly") { // if start button is pressed
+
+    await interaction.deferUpdate()
+    for (let i=4; i >= 0; i -= 1) {
+      flyRocket(i, i)
+  
+      const spawnEmbed = new EmbedBuilder() // Create embed
+        .setTitle(`Height: ${i}`)
+        .setDescription(displayWorld.toString().replace(/,/g,'')) //convert board to string and remove ","
+        .setColor(`#${randomColor}`)
+        .setTimestamp()
+        .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` })
+    
+      if (i == 0) {
+        while (true) {
+          currentHeight++
+          await delay(700)
+          await interaction.editReply({ embeds: [spawnEmbed], components: [moveButton] }) 
+        }
+      }
+
+      await interaction.editReply({ embeds: [spawnEmbed], components: [moveButton] }) 
+      await delay(700)
+    }
+
+  }
+})
 
 // Move button command
 client.on('interactionCreate', async (interaction: any) => {
 	if (!interaction.isButton()) return;
 	if (interaction.customId == "btnLeft") { // if left button is pressed
-    spawnSky()
+    const moveRocketLeft = () => {
+      for (let number in currentRocket) {
+        currentRocket[number][1] -= 1
+      }
 
-    for (let num in rocketJSON.parts) { // loop trough rocket parts
-      rocketJSON.parts[num].position[1] -= 1
-      let xPos = rocketJSON.parts[num].position[0]
-      let yPos = rocketJSON.parts[num].position[1]
-      let blockColor = rocketJSON.parts[num].color
-      
-      board[xPos][yPos] = blockColor
+      for (let number in currentRocket) {
+        let partX = currentRocket[number][0]
+        let partY = currentRocket[number][1]
+        let partColor = currentRocket[number][2]
+        
+        displayWorld[partX][partY] = partColor
+      }
     }
+    moveRocketLeft()
+
     const spawnEmbed = new EmbedBuilder() // Create embed
-      .setTitle(`Rocket by user @${interaction.user.username}`)
-      .setDescription(board.toString().replace(/,/g,'')) //convert board to string and remove ","
+      .setTitle(`Height: ${currentHeight}`)
+      .setDescription(displayWorld.toString().replace(/,/g,'')) //convert board to string and remove ","
       .setColor(`#${randomColor}`)
       .setTimestamp()
       .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` })
@@ -310,82 +421,17 @@ client.on('interactionCreate', async (interaction: any) => {
   }
 
 	if (interaction.customId == "btnRight") { // if right button is pressed
-    spawnSky()
+    moveRocketRight()
 
-    for (let num in rocketJSON.parts) { // loop trough rocket parts
-      rocketJSON.parts[num].position[1] += 1
-      let xPos = rocketJSON.parts[num].position[0]
-      let yPos = rocketJSON.parts[num].position[1]
-      let blockColor = rocketJSON.parts[num].color
-
-      board[xPos][yPos] = blockColor
-    }
     const spawnEmbed = new EmbedBuilder() // Create embed
-      .setTitle(`Rocket by user @${interaction.user.username}`)
-      .setDescription(board.toString().replace(/,/g,'')) //convert board to string and remove ","
+      .setTitle(`Height: ${currentHeight}`)
+      .setDescription(displayWorld.toString().replace(/,/g,'')) //convert board to string and remove ","
       .setColor(`#${randomColor}`)
       .setTimestamp()
       .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` })
 
     await interaction.deferUpdate()
     await interaction.editReply({ embeds: [spawnEmbed], components: [moveButton] }) // reply with embed
-  }
-})
-
-// Start button command
-client.on('interactionCreate', async (interaction: any) => {
-	if (!interaction.isButton()) return;
-
-  const rocketFly = async () => {
-    for (let grassNum=4; grassNum >= 1; grassNum -= 1) {
-      let grassNumX = grassNum
-      let skyNumX = 12 - grassNumX
-      board = []
-
-      // generate background
-      for (let i=0; i < skyNumX; i++) { 
-        board.push([blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare,"\n"])
-        
-        if (i == (skyNumX-1)) { // if its end on the loop
-          for (let j=0; j < grassNumX; j++) { // loop that will add grass squares to the array
-            board.push([greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare, greenSquare,"\n"])
-          }
-        }
-      }
-
-      if (grassNum <= 1) {
-        await delay(800)
-        board = []
-
-        for (let i=0; i < 12; i++) {
-          board.push([blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare,"\n"])
-        }
-      }
-
-      // generate rocket
-      for (let num in rocketJSON.parts) {
-        let xPos = rocketJSON.parts[num].position[0]
-        let yPos = rocketJSON.parts[num].position[1]
-        let blockColor = rocketJSON.parts[num].color
-    
-        board[xPos][yPos] = blockColor // spawn rocket
-      }
-      
-      const spawnEmbed = new EmbedBuilder() // Create embed
-        .setTitle(`Rocket by user @${interaction.user.username}`)
-        .setDescription(board.toString().replace(/,/g,'')) //convert board to string and remove ","
-        .setColor(`#${randomColor}`)
-        .setTimestamp()
-        .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` })
-
-      await interaction.editReply({ embeds: [spawnEmbed], components: [moveButton] }) 
-      await delay(800)
-    }
-  }
-
-	if (interaction.customId == "startFly") { // if start button is pressed
-    await interaction.deferUpdate()
-    rocketFly()
   }
 })
 

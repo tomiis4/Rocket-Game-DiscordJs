@@ -73,8 +73,9 @@ let currentGround = 4;
 let currentSky = 12 - currentGround;
 
 let currentHeight: number = 0
-let purpleSkyNumb = 0
-let blueSkyNumb = 12
+
+let currentPurpleSize: number = 0
+let curretnSpace: any[] = []
 
 let currentWorld: any[] = []
 let displayWorld: any[] = currentWorld.slice()  
@@ -323,18 +324,25 @@ const moveRocketRight = () => {
 }
 
 const spawnSpace = () => {
-  currentWorld = []
-  let purpleSkyNumb = 0
-  let blueSkyNumb = 12
+  displayWorld = []
 
-  let purpleSky = currentWorld.push([purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare,"\n"])
-  let blueSky = currentWorld.push([blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare,"\n"])
+  const fullPurple = displayWorld.push([purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare,"\n"])
+  const fullBlue = displayWorld.push([blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare,"\n"])
 
-  for (let i=0; i < purpleSkyNumb; i++) {
-    purpleSky
-  }
-  for (let i=0; i < blueSkyNumb; i++) {
-    blueSky
+  if (currentPurpleSize != 0) {
+    for (let i=0; i < currentPurpleSize; i++) {
+      displayWorld.push([purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare,"\n"])
+    
+      if (i == currentPurpleSize -1) {
+        for (let j=0; j < (12-currentPurpleSize); j++) {
+          displayWorld.push([blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare,"\n"])
+        }
+      }
+    }
+  } else {
+    for (let j=0; j < 12; j++) {
+      displayWorld.push([blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare,"\n"])
+    }
   }
 }
 
@@ -343,6 +351,7 @@ const spawnSpace = () => {
 client.on('interactionCreate', async (interaction: any) => {
   if (!interaction.isChatInputCommand()) return;
   if (interaction.commandName == "spawn") {
+    // displayWorld = []
     getRandomClouds()
     getRocket()
     appendWorld()
@@ -367,24 +376,38 @@ client.on('interactionCreate', async (interaction: any) => {
     await interaction.deferUpdate()
     for (let i=4; i >= 0; i -= 1) {
       flyRocket(i, i)
-  
+      let currentDots: any[] = []
+      currentDots.push(i)
+
       const spawnEmbed = new EmbedBuilder() // Create embed
-        .setTitle(`Height: ${i}`)
-        .setDescription(displayWorld.toString().replace(/,/g,'')) //convert board to string and remove ","
+        .setTitle(`Ground: ${currentDots.toString().replace(/,/g,'')}`)
+        .setDescription(displayWorld.toString().replace(/,/g,'').replace(/0/g,'.').replace(/1/g,'.').replace(/2/g,'.').replace(/3/g,'.').replace(/4/g,'.')) //convert board to string and remove ","
         .setColor(`#${randomColor}`)
         .setTimestamp()
         .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` })
-    
-      if (i == 0) {
-        while (true) {
-          currentHeight++
-          await delay(700)
-          await interaction.editReply({ embeds: [spawnEmbed], components: [moveButton] }) 
-        }
-      }
-
+        
       await interaction.editReply({ embeds: [spawnEmbed], components: [moveButton] }) 
       await delay(700)
+    }
+    
+    for (currentHeight =0; currentHeight < 12; currentHeight++ ) {
+      
+      while (currentPurpleSize <= 12) {
+        spawnSpace()
+        
+        const spawnEmbed = new EmbedBuilder() // Create embed
+          .setTitle(`Height: ${currentHeight}`)
+          .setDescription(displayWorld.toString().replace(/,/g,'')) //convert board to string and remove ","
+          .setColor(`#${randomColor}`)
+          .setTimestamp()
+          .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` })
+          
+        await interaction.editReply({ embeds: [spawnEmbed], components: [moveButton] }) 
+        
+        currentPurpleSize++
+        currentHeight++
+        await delay(700)
+      }
     }
 
   }

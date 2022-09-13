@@ -1,13 +1,13 @@
 {
   "name": "main-bot-project",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.0.1",
+  "description": "A discord bot, where can fly & build your own rocket! ",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "tomiis4",
   "license": "ISC",
   "devDependencies": {
     "typescript": "^4.8.2"

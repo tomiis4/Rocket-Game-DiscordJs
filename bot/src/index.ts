@@ -238,17 +238,9 @@ const startButton = new ActionRowBuilder()
 )
 
 //Functions for rocket fly/move
-const getRandomClouds = () => {
-  // generate 5 clouds
-  for (let i=0; i<5; i++) {
-    let randomX = (Math.floor(Math.random() * 13) + 1)
-    let randomY = (Math.floor(Math.random() * 7) + 1)
-    clouds.push([randomX, randomX + 1, randomY])
-  }
-}
 const getWorld = () => {
   currentWorld = []
-
+  
   for (let i=0; i < currentSky; i++) {
     currentWorld.push([blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare,"\n"])
     
@@ -259,17 +251,47 @@ const getWorld = () => {
     }
   }
 }
-//! const appendClouds = () => {
-//   // for each cloud in array append to the world
-//   for (let cloudNumber in clouds) {
-//     let cloudX1 = clouds[cloudNumber][0]
-//     let cloudX2 = clouds[cloudNumber][1]
-//     let cloudY = clouds[cloudNumber][2]
 
-//     currentWorld[cloudY][cloudX1] = purpleSquare
-//     currentWorld[cloudY][cloudX2] = purpleSquare
-//   }
-//! }
+const getRandomClouds = () => {
+  // generate 5 clouds
+  for (let i=0; i<5; i++) {
+    let randomX = (Math.floor(Math.random() * 11))
+    let randomY = (Math.floor(Math.random() * 11))
+    clouds.push([randomX, randomX, randomY])
+  }
+}
+const appendClouds = () => {
+  // for each cloud in array append to the world
+  for (let cloudNumber in clouds) {
+    let cloudX1 = clouds[cloudNumber][0]
+    let cloudX2 = clouds[cloudNumber][1]
+    let cloudY = clouds[cloudNumber][2]
+
+    // if exist
+    if (displayWorld[cloudY][cloudX1] != undefined) {
+      // if is background blue
+      if (displayWorld[cloudY][cloudX1] == blueSquare) {
+        displayWorld[cloudY][cloudX1] = purpleSquare
+        displayWorld[cloudY][cloudX2] = purpleSquare
+      } 
+      // if its green => return green
+      else if (displayWorld[cloudY][cloudX1] == greenSquare){
+        displayWorld[cloudY][cloudX1] = greenSquare
+        displayWorld[cloudY][cloudX2] = greenSquare
+      }
+      // its its space
+      else if (displayWorld[cloudY][cloudX1] == purpleSquare){
+        displayWorld[cloudY][cloudX1] = blueSquare
+        displayWorld[cloudY][cloudX2] = blueSquare
+      } else {
+        console.error("Someting went wrong.")
+      }
+    } else {
+      console.log(`Cloud ${cloudY} & Cloud ${cloudX1} does not exist`)
+    }
+  }
+}
+
 const getRocket = () => {
   for (let num in rocketJSON.parts) {
     let xPosition = rocketJSON.parts[num].position[0]
@@ -285,6 +307,9 @@ const appendWorld = async () => {
   
   // duplicate world array
   displayWorld = currentWorld.slice() 
+
+  // append clouds
+  appendClouds()
 
   // append rocket
   for (let number in currentRocket) {
@@ -315,11 +340,13 @@ const flyRocket = (moveClouds: number, groundSize: number) => {
 
   displayWorld = currentWorld.slice() 
 
+  // move clouds & append
   for (let number in clouds) {
     clouds[number][2] -= moveClouds
   }
-  // appendClouds()
+  appendClouds()
 
+  // append rocket
   for (let number in currentRocket) {
     let partX = currentRocket[number][0]
     let partY = currentRocket[number][1]
@@ -410,6 +437,7 @@ client.on('interactionCreate', async (interaction: any) => {
       while (currentPurpleSize <= 12) {
         displayWorld = []
         spawnSpace()
+        appendClouds()
         
         const spawnEmbed = new EmbedBuilder() // Create embed
           .setTitle(`Height: ${currentHeight}`)

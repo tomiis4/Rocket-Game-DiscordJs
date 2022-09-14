@@ -50,6 +50,9 @@ let fullPurple = [purple, purple, purple, purple, purple, "\n"]
 //     }
 //   }
 // }
+
+
+//! Working
 let currentPurpleSizeX = 0
 let displayWorldX: any[]= []
 

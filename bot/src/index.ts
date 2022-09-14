@@ -8,19 +8,22 @@ const client = new Client({
   ]
 });
 
+// get informations from .env
 const clientId = process.env.CLIENT_ID;
 const token = process.env.TOKEN;
 const guildId = process.env.GUILD_ID;
+
 const rest = new REST({ version: '10' }).setToken(token);
 
 const randomColor = Math.floor(Math.random()*16777215).toString(16);
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
+// activate when discord bot is online
 client.on("ready", () => {
-    console.log(`[DISCORD] ${client.user.username} has been online`);
+  console.log(`[DISCORD] ${client.user.username} has been online`);
 })
 
-
+// store every command
 const commands = [
   {
     name: 'ping',
@@ -31,7 +34,7 @@ const commands = [
     description: 'spawn command will respond with board.'
   }
 ];
-// Spawn commands
+// Activate each command.
 (async () => {
 	try {
 		await rest.put(
@@ -48,6 +51,8 @@ const commands = [
 // Ping command
 client.on('interactionCreate', async (interaction: any) => {
   if (!interaction.isChatInputCommand()) return;
+  
+  // if command is /ping
   if (interaction.commandName == "ping") {
     const pingEmbed = new EmbedBuilder()
       .setTitle(`Response time is: ${ Date.now() - interaction.createdTimestamp}ms`)
@@ -58,7 +63,7 @@ client.on('interactionCreate', async (interaction: any) => {
 });
 
 
-// Variables
+//? Variables
 const blueSquare = ":blue_square:"
 const greenSquare = ":green_square:"
 const blackSquare = ":black_large_square:"
@@ -75,11 +80,11 @@ let currentSky = 12 - currentGround;
 let currentHeight: number = 0
 
 let currentPurpleSize: number = 0
-let curretnSpace: any[] = []
 
 let currentWorld: any[] = []
 let displayWorld: any[] = currentWorld.slice()  
 
+const rocketSpeed = 700
 let currentRocket: any[] = []
 const rocketJSON = {
   name: "rocket1",
@@ -212,6 +217,7 @@ const rocketJSON = {
   ]
 }
 
+// Buttons
 const moveButton = new ActionRowBuilder()
   .addComponents(
     new ButtonBuilder()
@@ -231,8 +237,9 @@ const startButton = new ActionRowBuilder()
       .setStyle(ButtonStyle.Success),
 )
 
-
+//Functions for rocket fly/move
 const getRandomClouds = () => {
+  // generate 5 clouds
   for (let i=0; i<5; i++) {
     let randomX = (Math.floor(Math.random() * 13) + 1)
     let randomY = (Math.floor(Math.random() * 7) + 1)
@@ -241,6 +248,7 @@ const getRandomClouds = () => {
 }
 const getWorld = () => {
   currentWorld = []
+
   for (let i=0; i < currentSky; i++) {
     currentWorld.push([blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare,"\n"])
     
@@ -252,6 +260,7 @@ const getWorld = () => {
   }
 }
 //! const appendClouds = () => {
+//   // for each cloud in array append to the world
 //   for (let cloudNumber in clouds) {
 //     let cloudX1 = clouds[cloudNumber][0]
 //     let cloudX2 = clouds[cloudNumber][1]
@@ -273,9 +282,11 @@ const getRocket = () => {
 const appendWorld = async () => {  
   currentWorld = []
   getWorld()
-  // appendClouds()
-  displayWorld = currentWorld.slice()  
+  
+  // duplicate world array
+  displayWorld = currentWorld.slice() 
 
+  // append rocket
   for (let number in currentRocket) {
     let partX = currentRocket[number][0]
     let partY = currentRocket[number][1]
@@ -286,10 +297,12 @@ const appendWorld = async () => {
 }
 const flyRocket = (moveClouds: number, groundSize: number) => {
   currentWorld = []
+
   let currentGroundFly = groundSize
   currentGround = groundSize
   let currentSkyFly = 12 - currentGroundFly
 
+  //change sky & ground
   for (let i=0; i < currentSkyFly; i++) {
     currentWorld.push([blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare,"\n"])
     
@@ -315,21 +328,12 @@ const flyRocket = (moveClouds: number, groundSize: number) => {
     displayWorld[partX][partY] = partColor
   }
 }
-
-const moveRocketRight = () => {
-  for (let number in currentRocket) {
-    currentRocket[number][1] += 1 
-  }
-  appendWorld()
-}
-
-const spawnSpace = () => {
+const spawnSpace = async () => {
   displayWorld = []
 
-  const fullPurple = displayWorld.push([purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare,"\n"])
-  const fullBlue = displayWorld.push([blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare,"\n"])
-
-  if (currentPurpleSize != 0) {
+  // if its not current space
+  if (currentPurpleSize > 0) {
+    // change from sky to space
     for (let i=0; i < currentPurpleSize; i++) {
       displayWorld.push([purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare,"\n"])
     
@@ -339,10 +343,21 @@ const spawnSpace = () => {
         }
       }
     }
-  } else {
-    for (let j=0; j < 12; j++) {
+  } 
+  
+  // generate full sky
+  else if (currentPurpleSize == 0) {
+    for (let x=0; x < 12; x++) {
       displayWorld.push([blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare,"\n"])
     }
+  }
+
+  for (let number in currentRocket) {
+    let partX = currentRocket[number][0]
+    let partY = currentRocket[number][1]
+    let partColor = currentRocket[number][2]
+    
+    displayWorld[partX][partY] = partColor
   }
 }
 
@@ -351,7 +366,6 @@ const spawnSpace = () => {
 client.on('interactionCreate', async (interaction: any) => {
   if (!interaction.isChatInputCommand()) return;
   if (interaction.commandName == "spawn") {
-    // displayWorld = []
     getRandomClouds()
     getRocket()
     appendWorld()
@@ -361,7 +375,7 @@ client.on('interactionCreate', async (interaction: any) => {
       .setDescription(displayWorld.toString().replace(/,/g,'')) //convert board to string and remove ","
       .setColor(`#${randomColor}`)
       .setTimestamp()
-      .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` })
+      .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` }) // respond with res.
     
     await interaction.reply({ embeds: [spawnEmbed], components: [startButton] }) // reply with embed
   }
@@ -372,8 +386,9 @@ client.on('interactionCreate', async (interaction: any) => {
 client.on('interactionCreate', async (interaction: any) => {
 	if (!interaction.isButton()) return;
 	if (interaction.customId == "startFly") { // if start button is pressed
-
     await interaction.deferUpdate()
+    
+    // launch rocket from ground
     for (let i=4; i >= 0; i -= 1) {
       flyRocket(i, i)
       let currentDots: any[] = []
@@ -384,15 +399,16 @@ client.on('interactionCreate', async (interaction: any) => {
         .setDescription(displayWorld.toString().replace(/,/g,'').replace(/0/g,'.').replace(/1/g,'.').replace(/2/g,'.').replace(/3/g,'.').replace(/4/g,'.')) //convert board to string and remove ","
         .setColor(`#${randomColor}`)
         .setTimestamp()
-        .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` })
+        .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` }) // respond with res. time
         
       await interaction.editReply({ embeds: [spawnEmbed], components: [moveButton] }) 
-      await delay(700)
+      await delay(rocketSpeed)
     }
     
+    // fly rocket from sky to space
     for (currentHeight =0; currentHeight < 12; currentHeight++ ) {
-      
       while (currentPurpleSize <= 12) {
+        displayWorld = []
         spawnSpace()
         
         const spawnEmbed = new EmbedBuilder() // Create embed
@@ -400,23 +416,24 @@ client.on('interactionCreate', async (interaction: any) => {
           .setDescription(displayWorld.toString().replace(/,/g,'')) //convert board to string and remove ","
           .setColor(`#${randomColor}`)
           .setTimestamp()
-          .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` })
-          
-        await interaction.editReply({ embeds: [spawnEmbed], components: [moveButton] }) 
+          .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` }) // respond with res. time
+        await interaction.editReply({ embeds: [spawnEmbed], components: [moveButton] }) // reply with embed
         
         currentPurpleSize++
         currentHeight++
-        await delay(700)
+        await delay(rocketSpeed)
       }
     }
-
   }
 })
 
 // Move button command
 client.on('interactionCreate', async (interaction: any) => {
 	if (!interaction.isButton()) return;
-	if (interaction.customId == "btnLeft") { // if left button is pressed
+  
+  // if left button is pressed
+	if (interaction.customId == "btnLeft") { 
+    // change every part Y position to -=1
     const moveRocketLeft = () => {
       for (let number in currentRocket) {
         currentRocket[number][1] -= 1
@@ -437,13 +454,28 @@ client.on('interactionCreate', async (interaction: any) => {
       .setDescription(displayWorld.toString().replace(/,/g,'')) //convert board to string and remove ","
       .setColor(`#${randomColor}`)
       .setTimestamp()
-      .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` })
+      .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` }) // respond with res. time
 
     await interaction.deferUpdate()
     await interaction.editReply({ embeds: [spawnEmbed], components: [moveButton] }) // reply with embed
   }
 
-	if (interaction.customId == "btnRight") { // if right button is pressed
+  // if right button is pressed
+	if (interaction.customId == "btnRight") { 
+    // change every part Y position to -=1
+    const moveRocketRight = () => {
+      for (let number in currentRocket) {
+        currentRocket[number][1] += 1
+      }
+
+      for (let number in currentRocket) {
+        let partX = currentRocket[number][0]
+        let partY = currentRocket[number][1]
+        let partColor = currentRocket[number][2]
+        
+        displayWorld[partX][partY] = partColor
+      }
+    }
     moveRocketRight()
 
     const spawnEmbed = new EmbedBuilder() // Create embed
@@ -451,7 +483,7 @@ client.on('interactionCreate', async (interaction: any) => {
       .setDescription(displayWorld.toString().replace(/,/g,'')) //convert board to string and remove ","
       .setColor(`#${randomColor}`)
       .setTimestamp()
-      .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` })
+      .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` }) // respond with res. time
 
     await interaction.deferUpdate()
     await interaction.editReply({ embeds: [spawnEmbed], components: [moveButton] }) // reply with embed

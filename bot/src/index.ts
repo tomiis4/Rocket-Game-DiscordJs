@@ -257,37 +257,37 @@ const getRandomClouds = () => {
   for (let i=0; i<5; i++) {
     let randomX = (Math.floor(Math.random() * 11))
     let randomY = (Math.floor(Math.random() * 11))
-    clouds.push([randomX, randomX, randomY])
+    clouds.push([randomX, randomX += 1, randomY])
   }
 }
 const appendClouds = () => {
   // for each cloud in array append to the world
   for (let cloudNumber in clouds) {
-    let cloudX1 = clouds[cloudNumber][0]
-    let cloudX2 = clouds[cloudNumber][1]
-    let cloudY = clouds[cloudNumber][2]
+    let cloudX1Append = clouds[cloudNumber][0]
+    let cloudX2Append = clouds[cloudNumber][1]
+    let cloudYAppend = clouds[cloudNumber][2]
 
     // if exist
-    if (displayWorld[cloudY][cloudX1] != undefined) {
+    if (displayWorld[cloudYAppend][cloudX1Append]) {
       // if is background blue
-      if (displayWorld[cloudY][cloudX1] == blueSquare) {
-        displayWorld[cloudY][cloudX1] = purpleSquare
-        displayWorld[cloudY][cloudX2] = purpleSquare
+      if (displayWorld[cloudYAppend][cloudX1Append] == blueSquare) {
+        displayWorld[cloudYAppend][cloudX1Append] = purpleSquare
+        displayWorld[cloudYAppend][cloudX2Append] = purpleSquare
       } 
       // if its green => return green
-      else if (displayWorld[cloudY][cloudX1] == greenSquare){
-        displayWorld[cloudY][cloudX1] = greenSquare
-        displayWorld[cloudY][cloudX2] = greenSquare
+      else if (displayWorld[cloudYAppend][cloudX1Append] == greenSquare){
+        displayWorld[cloudYAppend][cloudX1Append] = greenSquare
+        displayWorld[cloudYAppend][cloudX2Append] = greenSquare
       }
       // its its space
-      else if (displayWorld[cloudY][cloudX1] == purpleSquare){
-        displayWorld[cloudY][cloudX1] = blueSquare
-        displayWorld[cloudY][cloudX2] = blueSquare
+      else if (displayWorld[cloudYAppend][cloudX1Append] == purpleSquare){
+        displayWorld[cloudYAppend][cloudX1Append] = blueSquare
+        displayWorld[cloudYAppend][cloudX2Append] = blueSquare
       } else {
         console.error("Someting went wrong.")
       }
     } else {
-      console.log(`Cloud ${cloudY} & Cloud ${cloudX1} does not exist`)
+      console.log(`Cloud ${cloudYAppend} & Cloud ${cloudX1Append} does not exist`)
     }
   }
 }
@@ -340,10 +340,10 @@ const flyRocket = (moveClouds: number, groundSize: number) => {
 
   displayWorld = currentWorld.slice() 
 
-  // move clouds & append
-  for (let number in clouds) {
-    clouds[number][2] -= moveClouds
-  }
+  //! move clouds & append
+  // for (let number in clouds) {
+  //   clouds[number][2] -= moveClouds
+  // }
   appendClouds()
 
   // append rocket
@@ -393,6 +393,15 @@ const spawnSpace = async () => {
 client.on('interactionCreate', async (interaction: any) => {
   if (!interaction.isChatInputCommand()) return;
   if (interaction.commandName == "spawn") {
+    clouds= []
+    currentGround = 4;
+    currentSky = 12 - currentGround;
+    currentHeight = 0
+    currentPurpleSize = 0
+    currentWorld = []
+    displayWorld = currentWorld.slice()  
+    currentRocket = []
+
     getRandomClouds()
     getRocket()
     appendWorld()
@@ -408,7 +417,7 @@ client.on('interactionCreate', async (interaction: any) => {
   }
 });
 
-//TODO Add clouds
+//TODO Fix clouds
 // Start button command
 client.on('interactionCreate', async (interaction: any) => {
 	if (!interaction.isButton()) return;

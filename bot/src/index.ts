@@ -32,6 +32,10 @@ const commands = [
   {
     name: 'spawn',
     description: 'spawn command will respond with board.'
+  },
+  {
+    name: 'create',
+    description: 'create command will allow you to create own rocket!'
   }
 ];
 // Activate each command.
@@ -526,5 +530,152 @@ client.on('interactionCreate', async (interaction: any) => {
     await interaction.editReply({ embeds: [spawnEmbed], components: [moveButton] }) // reply with embed
   }
 })
+
+
+let itemPositionBuild: any[] = []
+let itemTypeBuild: any[] = []
+
+let createRocketBlueprin: any[] = []
+
+let teplateRocket: any = {
+  name: "rocketX",
+  parts: []
+}
+
+
+
+const moveButtonBuild = new ActionRowBuilder()
+  .addComponents(
+    new ButtonBuilder() // place button
+      .setCustomId('putObjectBuild')
+      .setLabel('Place')
+      .setStyle(ButtonStyle.Success),
+    new ButtonBuilder() // left button
+      .setCustomId('leftBuild')
+      .setLabel('Left')
+      .setStyle(ButtonStyle.Primary),
+    new ButtonBuilder() // right button
+      .setCustomId('rightBuild')
+      .setLabel('Right')
+      .setStyle(ButtonStyle.Primary),
+    new ButtonBuilder() // top button
+      .setCustomId('topBuild')
+      .setLabel('Top')
+      .setStyle(ButtonStyle.Primary),
+    new ButtonBuilder() // bottom button
+      .setCustomId('bottomBuild')
+      .setLabel('Bottom')
+      .setStyle(ButtonStyle.Primary),
+  )
+const selectItemBuild = new ActionRowBuilder()
+  .addComponents(
+    new SelectMenuBuilder() // select block
+      .setCustomId('selectBlock')
+      .setPlaceholder('Nothing is selected')
+      .addOptions(
+        {
+          label: `Capsule`,
+          description: 'Add capsule to your rocket.',
+          value: 'addCapsule',
+        },
+        {
+          label: `Fuel`,
+          description: 'Add fuel to your rocket.',
+          value: 'addFuel',
+        },
+        {
+          label: `Engine`,
+          description: 'Add engine to your rocket.',
+          value: 'addEngine',
+        },
+      ),
+  )
+const createBlueprint = () => {
+  createRocketBlueprin = []
+
+  for (let i=0; i < 12; i++) {
+    createRocketBlueprin.push([blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare, blueSquare,"\n"])
+  }
+}
+const colorCheck = (item: string) => {
+  if (item == "addCapsule") {
+    return blackSquare
+  }
+  else if (item == "addFuel") {
+    return whiteSquare
+  }
+  else if (item == "addEngine") {
+    return blackSquare
+  }
+}
+const createBlock = (itemName: string) => {
+  createBlueprint()
+
+  itemPositionBuild = [0,0]
+  itemTypeBuild = [colorCheck(itemName), itemName]
+
+  createRocketBlueprin[itemPositionBuild[1]][itemPositionBuild[0]] = itemTypeBuild[0]
+}
+
+// Create rocket command
+client.on('interactionCreate', async (interaction: any) => {
+	if (!interaction.isChatInputCommand()) return;
+  
+  // if create command was activated
+	if (interaction.commandName == "create") { 
+    createBlueprint()
+
+    const spawnEmbed = new EmbedBuilder() // Create embed
+      .setTitle(`Blueprint by user ${interaction.user.username}`)
+      .setDescription(createRocketBlueprin.toString().replace(/,/g,'')) //convert board to string and remove ","
+      .setColor(`#${randomColor}`)
+      .setTimestamp()
+      .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` }) // respond with res. time
+
+  await interaction.reply({ embeds: [spawnEmbed], components: [moveButtonBuild, selectItemBuild] }) // reply with embed
+  }
+})
+
+// Add item command
+client.on('interactionCreate', async (interaction: any) => {
+	if (!interaction.isSelectMenu()) return;
+  
+  // add item
+	if (interaction != undefined) { 
+    createBlock(interaction.values)
+
+    const spawnEmbed = new EmbedBuilder() // Create embed
+      .setTitle(`Blueprint by user ${interaction.user.username}`)
+      .setDescription(createRocketBlueprin.toString().replace(/,/g,'')) //convert board to string and remove ","
+      .setColor(`#${randomColor}`)
+      .setTimestamp()
+      .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` }) // respond with res. time
+
+    await interaction.deferUpdate()
+    await interaction.editReply({ embeds: [spawnEmbed], components: [moveButtonBuild, selectItemBuild] }) // reply with embed
+  }
+})
+
+//! Rocket buttons command
+// client.on('interactionCreate', async (interaction: any) => {
+// 	if (!interaction.isButton()) return;
+  
+//   // if left button is pressed
+// 	if (interaction.commandName == "leftBuild") { 
+//     teplateRocket.name = `${interaction.user.username}`
+
+
+//     const spawnEmbed = new EmbedBuilder() // Create embed
+//       .setTitle(`Blueprint by user ${interaction.user.username}`)
+//       .setDescription(createRocketBlueprin.toString().replace(/,/g,'')) //convert board to string and remove ","
+//       .setColor(`#${randomColor}`)
+//       .setTimestamp()
+//       .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` }) // respond with res. time
+
+//   await interaction.deferUpdate()
+//   await interaction.editReply({ embeds: [spawnEmbed], components: [moveButtonBuild, selectItemBuild] }) // reply with embed
+//   }
+// })
+
 
 client.login(token); 

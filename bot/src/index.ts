@@ -90,135 +90,13 @@ let displayWorld: any[] = currentWorld.slice()
 
 const rocketSpeed = 700
 let currentRocket: any[] = []
-const rocketJSON = {
+
+//? tom4sko rocket
+const tom4skoRocket = [{ position: [6,2],  color: blackSquare }, { position: [6,3],  color: blackSquare }, { position: [5,3],  color: blackSquare }, { position: [7,3],  color: blackSquare }, { position: [7,4],  color: whiteSquare  }, { position: [5,4],  color: whiteSquare  }, { position: [6,4],  color: whiteBlackSquare  }, { position: [7,6],  color: whiteSquare  }, { position: [5,6],  color: whiteSquare  }, { position: [6,6],  color: whiteBlackSquare  }, { position: [7,5],  color: whiteSquare  }, { position: [5,5],  color: whiteSquare  }, { position: [6,5],  color: whiteSquare  }, { position: [7,7],  color: whiteSquare  }, { position: [5,7],  color: whiteSquare  }, { position: [6,7],  color: whiteSquare  }, { position: [4,8],  color: blackSquare  }, { position: [5,8],  color: blackSquare  }, { position: [7,8],  color: blackSquare  }, { position: [8,8],  color: blackSquare  }, { position: [4,9],  color: blackSquare  }, { position: [8,9],  color: blackSquare  }]
+
+let rocketJSON: any = {
   name: "rocket1",
-  parts: [
-    // capsule
-    {
-      position: [1, 6], // x, y
-      color: blackSquare
-    },
-    {
-      position: [2, 5], // x, y
-      color: blackSquare
-    },
-    {
-      position: [2, 6], // x, y
-      color: blackSquare
-    },
-    {
-      position: [2, 7], // x, y
-      color: blackSquare
-    },
-    // fuel tanks
-    {
-      position: [3, 5], // x, y
-      color: whiteSquare
-    },
-    {
-      position: [3, 6], // x, y
-      color: whiteSquare
-    },
-    {
-      position: [3, 7], // x, y
-      color: whiteSquare
-    },
-    {
-      position: [4, 5], // x, y
-      color: whiteSquare
-    },
-    {
-      position: [4, 6], // x, y
-      color: whiteSquare
-    },
-    {
-      position: [4, 7], // x, y
-      color: whiteSquare
-    },
-    {
-      position: [5, 5], // x, y
-      color: whiteSquare
-    },
-    {
-      position: [5, 6], // x, y
-      color: whiteSquare
-    },
-    {
-      position: [5, 7], // x, y
-      color: whiteSquare
-    },
-    {
-      position: [6, 5], // x, y
-      color: whiteSquare
-    },
-    {
-      position: [6, 6], // x, y
-      color: whiteSquare
-    },
-    {
-      position: [6, 7], // x, y
-      color: whiteSquare
-    },
-    {
-      position: [7, 5], // x, y
-      color: whiteSquare
-    },
-    {
-      position: [7, 6], // x, y
-      color: whiteSquare
-    },
-    {
-      position: [7, 7], // x, y
-      color: whiteSquare
-    },
-    // engine
-    {
-      position: [8, 4], // x, y
-      color: blackSquare
-    },
-    {
-      position: [8, 6], // x, y
-      color: blackSquare
-    },
-    {
-      position: [8, 8], // x, y
-      color: blackSquare
-    },
-    // fire 1
-    {
-      position: [9, 4], // x, y
-      color: yellowSquare
-    },
-    {
-      position: [9, 5], // x, y
-      color: orangeSquare
-    },
-    {
-      position: [9, 6], // x, y
-      color: yellowSquare
-    },
-    {
-      position: [9, 7], // x, y
-      color: orangeSquare
-    },
-    {
-      position: [9, 8], // x, y
-      color: yellowSquare
-    },
-    // fire 2
-    {
-      position: [10, 5], // x, y
-      color: redSquare
-    },
-    {
-      position: [10, 6], // x, y
-      color: orangeSquare
-    },
-    {
-      position: [10, 7], // x, y
-      color: redSquare
-    },
-  ]
+  parts: []
 }
 
 // Buttons
@@ -534,10 +412,6 @@ let itemPositionBuild: any[] = []
 let itemTypeBuild: any[] = []
 
 let createRocketBlueprin: any[] = []
-let teplateRocket: any = {
-  name: "rocketX",
-  parts: []
-}
 
 // buttons & sellect menu
 const moveButtonBuild = new ActionRowBuilder()
@@ -612,10 +486,10 @@ const colorCheck = (item: string) => {
 // Main functions
 const generateJSON = () => {
   // loop trough items from JSON to the blueprint
-  for (let num in teplateRocket.parts) {
-    let xPosition = teplateRocket.parts[num].position[0]
-    let yPosition = teplateRocket.parts[num].position[1]
-    let blockColor = teplateRocket.parts[num].color
+  for (let num in rocketJSON.parts) {
+    let xPosition = rocketJSON.parts[num].position[0]
+    let yPosition = rocketJSON.parts[num].position[1]
+    let blockColor = rocketJSON.parts[num].color
     
     createRocketBlueprin[yPosition][xPosition] = blockColor
   }
@@ -639,7 +513,7 @@ const createBlock = (itemName: string) => {
 }
 const placeBlock = () => {
   // push object to the JSON & rese current item
-  teplateRocket.parts.push({
+  rocketJSON.parts.push({
     position: itemPositionBuild,
     color: itemTypeBuild[0]
   })
@@ -667,7 +541,7 @@ client.on('interactionCreate', async (interaction: any) => {
   itemPositionBuild = []
   itemTypeBuild = []
   createRocketBlueprin = []
-  teplateRocket = {
+  rocketJSON = {
     name: interaction.user.username,
     parts: []
   }
@@ -727,7 +601,7 @@ client.on('interactionCreate', async (interaction: any) => {
   }
 
   // if left button was pressed
-	else if (interaction.customId == "leftBuild") { 
+	else if (interaction.customId == "leftBuild" && itemPositionBuild[0] > 0) { 
     moveBlockX(-1)
 
     const spawnEmbed = new EmbedBuilder() // Create embed
@@ -742,7 +616,7 @@ client.on('interactionCreate', async (interaction: any) => {
   }
 
   // if right button was pressed
-	else if (interaction.customId == "rightBuild") { 
+	else if (interaction.customId == "rightBuild" && itemPositionBuild[0] < 12) { 
     moveBlockX(1)
 
     const spawnEmbed = new EmbedBuilder() // Create embed
@@ -757,7 +631,7 @@ client.on('interactionCreate', async (interaction: any) => {
   }
 
   // if top button was pressed
-	else if (interaction.customId == "topBuild") { 
+	else if (interaction.customId == "topBuild" && itemPositionBuild[1] > 0) { 
     moveBlockY(-1)
 
     const spawnEmbed = new EmbedBuilder() // Create embed
@@ -772,9 +646,21 @@ client.on('interactionCreate', async (interaction: any) => {
   }
 
   // if bottom button was pressed
-	else if (interaction.customId == "bottomBuild") { 
+	else if (interaction.customId == "bottomBuild" && itemPositionBuild[1] < 11) { 
     moveBlockY(1)
 
+    const spawnEmbed = new EmbedBuilder() // Create embed
+      .setTitle(`Blueprint by user ${interaction.user.username}`)
+      .setDescription(createRocketBlueprin.toString().replace(/,/g,'')) //convert board to string and remove ","
+      .setColor(`#${randomColor}`)
+      .setTimestamp()
+      .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` }) // respond with res. time
+
+    await interaction.deferUpdate()
+    await interaction.editReply({ embeds: [spawnEmbed], components: [moveButtonBuild, selectItemBuild] }) // reply with embed
+  } 
+  // if noting was pressed
+  else {
     const spawnEmbed = new EmbedBuilder() // Create embed
       .setTitle(`Blueprint by user ${interaction.user.username}`)
       .setDescription(createRocketBlueprin.toString().replace(/,/g,'')) //convert board to string and remove ","

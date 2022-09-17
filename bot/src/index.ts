@@ -407,6 +407,7 @@ client.on('interactionCreate', async (interaction: any) => {
   }
 })
 
+
 //? Variables
 let itemPositionBuild: any[] = []
 let itemTypeBuild: any[] = []

@@ -96,7 +96,7 @@ const tom4skoRocket = [{ position: [6,2],  color: blackSquare }, { position: [6,
 
 let rocketJSON: any = {
   name: "rocket1",
-  parts: []
+  parts: tom4skoRocket
 }
 
 // Buttons
@@ -182,6 +182,16 @@ const getRocket = () => {
     currentRocket.push([xPosition, yPosition, blockColor])
   }
 }
+const spawnRocket = () => {
+  for (let number in currentRocket) {
+    let partX = currentRocket[number][0]
+    let partY = currentRocket[number][1]
+    let partColor = currentRocket[number][2]
+    
+    displayWorld[partX][partY] = partColor
+  }
+}
+
 const appendWorld = async () => {  
   currentWorld = []
   getWorld()
@@ -193,13 +203,7 @@ const appendWorld = async () => {
   appendClouds()
 
   // append rocket
-  for (let number in currentRocket) {
-    let partX = currentRocket[number][0]
-    let partY = currentRocket[number][1]
-    let partColor = currentRocket[number][2]
-    
-    displayWorld[partX][partY] = partColor
-  }
+  spawnRocket()
 }
 const flyRocket = (moveClouds: number, groundSize: number) => {
   currentWorld = []
@@ -228,13 +232,7 @@ const flyRocket = (moveClouds: number, groundSize: number) => {
   appendClouds()
 
   // append rocket
-  for (let number in currentRocket) {
-    let partX = currentRocket[number][0]
-    let partY = currentRocket[number][1]
-    let partColor = currentRocket[number][2]
-    
-    displayWorld[partX][partY] = partColor
-  }
+  spawnRocket()
 }
 const spawnSpace = async () => {
   displayWorld = []
@@ -260,12 +258,15 @@ const spawnSpace = async () => {
     }
   }
 
-  for (let number in currentRocket) {
-    let partX = currentRocket[number][0]
-    let partY = currentRocket[number][1]
-    let partColor = currentRocket[number][2]
-    
-    displayWorld[partX][partY] = partColor
+  spawnRocket()
+}
+
+const spawnFullSpace = () => {
+  displayWorld = []
+  
+  // generate space
+  for (let i=0; i < 12; i++) {
+    displayWorld.push([purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare, purpleSquare,"\n"])
   }
 }
 
@@ -298,7 +299,7 @@ client.on('interactionCreate', async (interaction: any) => {
 });
 
 //TODO Fix clouds
-// Start button command
+// Start button command (run)
 client.on('interactionCreate', async (interaction: any) => {
 	if (!interaction.isButton()) return;
 	if (interaction.customId == "startFly") { // if start button is pressed
@@ -339,12 +340,35 @@ client.on('interactionCreate', async (interaction: any) => {
         currentPurpleSize++
         currentHeight++
         await delay(rocketSpeed)
+
+        // launching in space
+        if (currentPurpleSize == 12) {
+          while (currentPurpleSize <= 25) {
+            spawnFullSpace()
+
+            //! append moon
+            
+            spawnRocket()
+
+            const spawnEmbed = new EmbedBuilder() // Create embed
+              .setTitle(`Height: ${currentHeight}`)
+              .setDescription(displayWorld.toString().replace(/,/g,'')) //convert board to string and remove ","
+              .setColor(`#${randomColor}`)
+              .setTimestamp()
+              .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` }) // respond with res. time
+            await interaction.editReply({ embeds: [spawnEmbed], components: [moveButton] }) // reply with embed
+
+            currentPurpleSize++
+            currentHeight++
+            await delay(rocketSpeed)
+          }
+        }
       }
     }
   }
 })
 
-// Move button command
+// MoveX button command
 client.on('interactionCreate', async (interaction: any) => {
 	if (!interaction.isButton()) return;
   
@@ -661,7 +685,11 @@ client.on('interactionCreate', async (interaction: any) => {
     await interaction.editReply({ embeds: [spawnEmbed], components: [moveButtonBuild, selectItemBuild] }) // reply with embed
   } 
   // if noting was pressed
-  else {
+  else if (interaction.customId == "leftBuild" 
+    || interaction.customId == "rightBuild" 
+    || interaction.customId == "topBuild" 
+    || interaction.customId == "bottomBuild"
+  ) {
     const spawnEmbed = new EmbedBuilder() // Create embed
       .setTitle(`Blueprint by user ${interaction.user.username}`)
       .setDescription(createRocketBlueprin.toString().replace(/,/g,'')) //convert board to string and remove ","

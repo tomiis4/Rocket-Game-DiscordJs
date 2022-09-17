@@ -529,7 +529,7 @@ client.on('interactionCreate', async (interaction: any) => {
   }
 })
 
-
+//? Variables
 let itemPositionBuild: any[] = []
 let itemTypeBuild: any[] = []
 
@@ -539,10 +539,11 @@ let teplateRocket: any = {
   parts: []
 }
 
+// buttons & sellect menu
 const moveButtonBuild = new ActionRowBuilder()
   .addComponents(
     new ButtonBuilder() // place button
-      .setCustomId('putObjectBuild')
+      .setCustomId('placeObjectBuild')
       .setLabel('Place')
       .setStyle(ButtonStyle.Success),
     new ButtonBuilder() // left button
@@ -593,6 +594,7 @@ const selectItemBuild = new ActionRowBuilder()
 
 // secondary functions
 const colorCheck = (item: string) => {
+  // check what item is what color
   if (item == "addCapsule") {
     return blackSquare
   }
@@ -609,6 +611,7 @@ const colorCheck = (item: string) => {
 
 // Main functions
 const generateJSON = () => {
+  // loop trough items from JSON to the blueprint
   for (let num in teplateRocket.parts) {
     let xPosition = teplateRocket.parts[num].position[0]
     let yPosition = teplateRocket.parts[num].position[1]
@@ -626,6 +629,7 @@ const createBlueprint = () => {
   generateJSON()
 }
 const createBlock = (itemName: string) => {
+  // add block to the blueprint
   createBlueprint()
 
   itemPositionBuild = [0,0]
@@ -634,6 +638,7 @@ const createBlock = (itemName: string) => {
   createRocketBlueprin[itemPositionBuild[1]][itemPositionBuild[0]] = itemTypeBuild[0]
 }
 const placeBlock = () => {
+  // push object to the JSON & rese current item
   teplateRocket.parts.push({
     position: itemPositionBuild,
     color: itemTypeBuild[0]
@@ -658,6 +663,7 @@ const moveBlockY = (yPosition: number) => {
 // Create rocket command
 client.on('interactionCreate', async (interaction: any) => {
 	if (!interaction.isChatInputCommand()) return;
+  // reset every variable 
   itemPositionBuild = []
   itemTypeBuild = []
   createRocketBlueprin = []
@@ -685,7 +691,7 @@ client.on('interactionCreate', async (interaction: any) => {
 client.on('interactionCreate', async (interaction: any) => {
 	if (!interaction.isSelectMenu()) return;
   
-  // add item
+  // if sometinh was selected in the sellect menu
 	if (interaction != undefined) { 
     createBlock(interaction.values)
 
@@ -706,7 +712,7 @@ client.on('interactionCreate', async (interaction: any) => {
 	if (!interaction.isButton()) return;
   
   // if place button is pressed
-	if (interaction.customId == "putObjectBuild") { 
+	if (interaction.customId == "placeObjectBuild") { 
     placeBlock()
 
     const spawnEmbed = new EmbedBuilder() // Create embed
@@ -716,10 +722,11 @@ client.on('interactionCreate', async (interaction: any) => {
       .setTimestamp()
       .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` }) // respond with res. time
 
-  await interaction.deferUpdate()
-  await interaction.editReply({ embeds: [spawnEmbed], components: [moveButtonBuild, selectItemBuild] }) // reply with embed
+    await interaction.deferUpdate()
+    await interaction.editReply({ embeds: [spawnEmbed], components: [moveButtonBuild, selectItemBuild] }) // reply with embed
   }
 
+  // if left button was pressed
 	else if (interaction.customId == "leftBuild") { 
     moveBlockX(-1)
 
@@ -730,9 +737,11 @@ client.on('interactionCreate', async (interaction: any) => {
       .setTimestamp()
       .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` }) // respond with res. time
 
-  await interaction.deferUpdate()
-  await interaction.editReply({ embeds: [spawnEmbed], components: [moveButtonBuild, selectItemBuild] }) // reply with embed
+    await interaction.deferUpdate()
+    await interaction.editReply({ embeds: [spawnEmbed], components: [moveButtonBuild, selectItemBuild] }) // reply with embed
   }
+
+  // if right button was pressed
 	else if (interaction.customId == "rightBuild") { 
     moveBlockX(1)
 
@@ -743,9 +752,11 @@ client.on('interactionCreate', async (interaction: any) => {
       .setTimestamp()
       .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` }) // respond with res. time
 
-  await interaction.deferUpdate()
-  await interaction.editReply({ embeds: [spawnEmbed], components: [moveButtonBuild, selectItemBuild] }) // reply with embed
+    await interaction.deferUpdate()
+    await interaction.editReply({ embeds: [spawnEmbed], components: [moveButtonBuild, selectItemBuild] }) // reply with embed
   }
+
+  // if top button was pressed
 	else if (interaction.customId == "topBuild") { 
     moveBlockY(-1)
 
@@ -756,9 +767,11 @@ client.on('interactionCreate', async (interaction: any) => {
       .setTimestamp()
       .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` }) // respond with res. time
 
-  await interaction.deferUpdate()
-  await interaction.editReply({ embeds: [spawnEmbed], components: [moveButtonBuild, selectItemBuild] }) // reply with embed
+    await interaction.deferUpdate()
+    await interaction.editReply({ embeds: [spawnEmbed], components: [moveButtonBuild, selectItemBuild] }) // reply with embed
   }
+
+  // if bottom button was pressed
 	else if (interaction.customId == "bottomBuild") { 
     moveBlockY(1)
 
@@ -769,8 +782,8 @@ client.on('interactionCreate', async (interaction: any) => {
       .setTimestamp()
       .setFooter({ text:`Response time is: ${ Date.now() - interaction.createdTimestamp}ms` }) // respond with res. time
 
-  await interaction.deferUpdate()
-  await interaction.editReply({ embeds: [spawnEmbed], components: [moveButtonBuild, selectItemBuild] }) // reply with embed
+    await interaction.deferUpdate()
+    await interaction.editReply({ embeds: [spawnEmbed], components: [moveButtonBuild, selectItemBuild] }) // reply with embed
   }
 })
 

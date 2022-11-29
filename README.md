@@ -1,16 +1,20 @@
 ﻿# Rocket-Game-DiscordJs
 ## In development
 
-### Todo
-  - [ ] Add moving clouds 
-  - [ ] Add planets
-  - [ ] Create website 
-  - [ ] Add fire to engine
-
-### Done
-  - [x] Ping command 
-  - [x] Fly rocket 
-  - [x] Move rocket 
-  - [x] Generate clouds 
-  - [x] Generate rocket from JSON 
-  - [x] Create own rocket
+### TODO
+  - [ ] Story/Meaning
+  - [ ] Control rocket
+  - [ ] Build rocket
+  - [ ] Generate object
+    - [ ] Rocket
+    - [ ] Clouds
+    - [ ] Sky
+    - [ ] Ground
+    - [ ] Stars/Planets ?
+  - [ ] Moving file from engine
+  
+  - [ ] Website
+    - [ ] See others planets
+    - [ ] See others score
+    - [ ] Build rocket inside browser
+    - [ ] Play game inside browser?

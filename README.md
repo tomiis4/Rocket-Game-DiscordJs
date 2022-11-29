@@ -18,3 +18,10 @@
     - [ ] See others score
     - [ ] Build rocket inside browser
     - [ ] Play game inside browser?
+
+#### Old version
+  - [x] Fly rocket 
+  - [x] Move rocket 
+  - [x] Generate clouds 
+  - [x] Generate rocket from JSON 
+  - [x] Create own rocket

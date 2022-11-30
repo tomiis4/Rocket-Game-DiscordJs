@@ -5,11 +5,12 @@
   - [ ] Story/Meaning
   - [ ] Control rocket
   - [ ] Build rocket
+  - [ ] Fly rocket/Move ground
   - [ ] Generate object
     - [ ] Rocket
     - [ ] Clouds
-    - [ ] Sky
-    - [ ] Ground
+    - [x] Sky
+    - [x] Ground
     - [ ] Stars/Planets ?
   - [ ] Moving file from engine
   

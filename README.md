@@ -3,7 +3,9 @@
 
 ### TODO
   - [ ] Story/Meaning
+  - [ ] Scale rocket and add planets
   - [ ] Control rocket
+  - [ ] Obstacles
   - [ ] Build rocket
   - [ ] Generate object
     - [ ] Rocket
@@ -11,7 +13,7 @@
     - [ ] Sky
     - [ ] Ground
     - [ ] Stars/Planets ?
-  - [ ] Moving file from engine
+  - [ ] Moving fire from engine
   
   - [ ] Website
     - [ ] See others planets

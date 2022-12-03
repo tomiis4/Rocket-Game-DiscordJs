@@ -11,35 +11,35 @@ const block = {
 	white: 'O',
 };
 const rocketParts = [
-	{ position: [2,6],  color: block.black  }, 
+	{ position: [6,2],  color: block.black  }, 
 	
-	{ position: [3,6],  color: block.black   }, 
-	{ position: [3,5],  color: block.black  }, 
-	{ position: [3,7],  color: block.black  }, 
+	{ position: [6,3],  color: block.black   }, 
+	{ position: [5,3],  color: block.black  }, 
+	{ position: [7,3],  color: block.black  }, 
 	
-	{ position: [4,5],  color: block.black   }, 
-	{ position: [4,6],  color: '=' },
-	{ position: [4,7],  color: block.black   },
+	{ position: [5,4],  color: block.black   }, 
+	{ position: [6,4],  color: '=' },
+	{ position: [7,4],  color: block.black   },
 	
-	{ position: [6,5],  color: block.white   }, 
-	{ position: [6,7],  color: block.white   }, 
+	{ position: [5,6],  color: block.white   }, 
+	{ position: [7,6],  color: block.white   }, 
 	{ position: [6,6],  color: '=' },
 	
-	{ position: [5,7],  color: block.white   }, 
+	{ position: [7,5],  color: block.white   }, 
 	{ position: [5,5],  color: block.white   }, 
-	{ position: [5,6],  color: block.white   },
+	{ position: [6,5],  color: block.white   },
 
 	{ position: [7,7],  color: block.white   }, 
-	{ position: [7,5],  color: block.white   }, 
-	{ position: [7,6],  color: block.white   },
+	{ position: [5,7],  color: block.white   }, 
+	{ position: [6,7],  color: block.white   },
 	
-	{ position: [8,4],  color: block.black   }, 
-	{ position: [8,5],  color: block.black   }, 
-	{ position: [8,7],  color: block.black   },
+	{ position: [4,8],  color: block.black   }, 
+	{ position: [5,8],  color: block.black   }, 
+	{ position: [7,8],  color: block.black   },
 	{ position: [8,8],  color: block.black   },
 	
-	{ position: [9,4],  color: block.black   },
-	{ position: [9,8],  color: block.black   }
+	{ position: [4,9],  color: block.black   },
+	{ position: [8,9],  color: block.black   }
 ]
 
 let cloudPoisition: number[][] = [];
@@ -49,6 +49,10 @@ let currentSky = 12 - currentGround;
 let currentWorld: string[][] = [[], [], [], [], [], [], [], [], [], [], [], []];
 
 let velocity = 700; // ms
+let isMoving = {
+	y: [true, true],
+	x: [true, true]
+};
 
 let rocketTemplate = {
 	name: 'rocket-1',
@@ -57,24 +61,46 @@ let rocketTemplate = {
 
 // functions
 const moveRocket = (side: 'x' | 'y', size: 0 | 1) => {
+	// 0 = down
+	// 1 = up
 	for (let i=0; i < rocketParts.length; i++) {
 		const partPosition = rocketParts[i].position;
+		const partsLength = rocketParts.length 
+		
+		const wasCheckedY = isMoving.y[1].toString();
 		
 		// move top/bottom
 		if (side == 'y') {
-			//FIXME check border colision 
-			if (rocketParts[0].position[0] == 0 && size == 1) {
-				return;
-			} else if (rocketParts[rocketParts.length-1].position[0] == rocketParts.length-1 && size == 0) {
-				return;
-			} else {
-				partPosition[0] += size==0 ? -1 : 1;
+			// check for colisio
+			if (
+				((12 - rocketParts[partsLength-1].position[1]) +
+				(rocketParts[0].position[1] + rocketParts[partsLength-1].position[1])) <= 12
+				&& size == 1
+			) {
+				isMoving.y[1] = false;
+			}
+			else if (rocketParts[partsLength-1].position[1] >= 11 && size == 0) {
+				isMoving.y[0] = false;
+			}
+			
+			// move
+			if (isMoving.y[1] && size == 1 || wasCheckedY== 'true' && size == 1) {
+				partPosition[1] -= 1;
+			} else if (isMoving.y[0] && size == 0) {
+				partPosition[1] += 1;
 			}
 		}
 		
 		// move left/right
 		else if (side == 'x') {
-			partPosition[1] += size==0 ? -1 : 1;
+			if (partPosition[0] != 0 && size != 0) {
+				partPosition[0] -= 1;
+			}
+			
+			
+			if (partPosition[0] < currentWorld[0].length-1 && size != 1) {
+				partPosition[0] += 1;
+			}
 		} else {
 			console.log(`Wrong direction ${side}`);
 		}
@@ -106,7 +132,7 @@ const getRocket = () => {
 		const yPosition = rocketPartObj.position[1];
 		const color = rocketPartObj.color;
 		
-		currentWorld[xPosition][yPosition] = color;
+		currentWorld[yPosition][xPosition] = color;
 	}
 }
 
@@ -117,8 +143,8 @@ const flyRocket = async () => {
 		
 		// append objects
 		getWorld();
+		moveRocket('x', 0);
 		getRocket();
-		moveRocket('y', 0)
 		
 		// write to console
 		console.clear();

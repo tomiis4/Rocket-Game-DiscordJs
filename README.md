@@ -7,11 +7,12 @@
   - [ ] Control rocket
   - [ ] Obstacles
   - [ ] Build rocket
+  - [ ] Fly rocket/Move ground
   - [ ] Generate object
     - [ ] Rocket
     - [ ] Clouds
-    - [ ] Sky
-    - [ ] Ground
+    - [x] Sky
+    - [x] Ground
     - [ ] Stars/Planets ?
   - [ ] Moving fire from engine
   
